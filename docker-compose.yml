@@ -1,0 +1,83 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:openssl
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mqtt/mosquitto/config:/mosquitto/config
+      - ./mqtt/mosquitto/data:/mosquitto/data
+      - ./mqtt/mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+  
+  postgres:
+    image: bitnami/postgresql:latest
+    container_name: postgres
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: adjis
+      POSTGRESQL_DATABASE: backend_transjakarta
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    restart: unless-stopped
+  
+  rabbitmqfix:
+    image: rabbitmq:management-alpine
+    container_name: rabbitmqfix
+    hostname: rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    container_name: api
+    env_file:
+      - ./api/.env
+    depends_on:
+      - mosquitto
+      - postgres
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  publisher:
+    build: ./publisher
+    container_name: publisher
+    depends_on:
+      - mosquitto
+      - worker
+
+  subscribe:
+    build: ./subscribe
+    container_name: subscribe
+    env_file:
+      - ./subscribe/.env
+    depends_on:
+      - mosquitto
+      - rabbitmqfix
+      - postgres
+      - worker
+    restart: unless-stopped
+
+  worker:
+    build: ./worker
+    container_name: worker
+    depends_on:
+      - rabbitmqfix
+    restart: unless-stopped
+volumes:
+  postgres_data:
+    external: true
+    name: b9653da8b4f5e35976501a1fb98e5a78d586296f82a660c250c87db7c48b0e0a
+  rabbitmq_data:
+    external: true
+    name: 3a109db04a37a5c7c12ce942350444d505efff160c6817c19fe0d47d6d1f53b8

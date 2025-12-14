@@ -1,0 +1,17 @@
+api/.env
+publisher/.env
+subscribe/.env
+
+mqtt/mosquitto/data/
+mqtt/mosquitto/log/
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+!.vscode/extensions.json
+
+.idea/
+tmp/
+temp/
+.cache/

@@ -1,0 +1,26 @@
+{
+	"info": {
+		"_postman_id": "e8fd9585-2fc6-4ee7-9f52-a21d069226be",
+		"name": "Backend-transjakarta",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7373962"
+	},
+	"item": [
+		{
+			"name": "get-last-location",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get-location-history-by-date",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
