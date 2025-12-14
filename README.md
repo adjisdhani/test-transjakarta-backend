@@ -22,6 +22,7 @@ cd test-transjakarta-backend
 
 ```sh
 install docker first
+add folder 'data' and 'log' in mqtt/mosquitto/
 ```
 
 ### 3. Install Dependencies
