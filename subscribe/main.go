@@ -157,10 +157,13 @@ func calculateDistance(lat1, lon1, lat2, lon2 float64) float64 {
 	return R * c
 }
 
+var poolState = map[string]bool{}
+
 func main() {
 	db.InitDB()
 
-	conn, err := amqp091.Dial("amqp://guest:guest@rabbitmqfix:5672")
+	// conn, err := amqp091.Dial("amqp://guest:guest@rabbitmqfix:5672")
+	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672")
 	if err != nil {
 		panic(err)
 	}
@@ -173,7 +176,8 @@ func main() {
 	defer channel.Close()
 
 	opts := mqtt.NewClientOptions().
-		AddBroker("tcp://mosquitto:1883").
+		// AddBroker("tcp://mosquitto:1883").
+		AddBroker("tcp://localhost:1883").
 		SetClientID("location-subscriber")
 
 	mqttClient := mqtt.NewClient(opts)
@@ -216,9 +220,18 @@ func main() {
 
 				fmt.Println("Jaraknya:", distance)
 
-				if distance >= 50 {
+				nowOutside := distance >= 50
+				prevOutside := poolState[loc.VehicleID]
+
+				if !prevOutside && nowOutside {
 					publishGeofenceEvent(channel, loc)
 				}
+
+				poolState[loc.VehicleID] = nowOutside
+
+				// if distance >= 50 {
+				// 	publishGeofenceEvent(channel, loc)
+				// }
 			}
 
 			fmt.Println("Topic:", m.Topic())

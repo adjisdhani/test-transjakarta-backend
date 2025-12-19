@@ -18,7 +18,8 @@ type GeofenceEvent struct {
 }
 
 func main() {
-	conn, err := amqp091.Dial("amqp://guest:guest@rabbitmqfix:5672")
+	// conn, err := amqp091.Dial("amqp://guest:guest@rabbitmqfix:5672")
+	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672")
 	if err != nil {
 		panic(err)
 	}
@@ -40,25 +41,34 @@ func main() {
 		nil,
 	)
 
-	queue, err := channel.QueueDeclare(
-		"geofence_alerts",
-		true,
+	// queue, err := channel.QueueDeclare(
+	// 	"geofence_alerts",
+	// 	true,
+	// 	false,
+	// 	false,
+	// 	false,
+	// 	nil,
+	// )
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// channel.QueueBind(
+	// 	queue.Name,
+	// 	"geofence_alerts",
+	// 	"fleet.events",
+	// 	false,
+	// 	nil,
+	// )
+
+	err = channel.Qos(
+		1,
+		0,
 		false,
-		false,
-		false,
-		nil,
 	)
 	if err != nil {
 		panic(err)
 	}
-
-	channel.QueueBind(
-		queue.Name,
-		"geofence_alerts",
-		"fleet.events",
-		false,
-		nil,
-	)
 
 	msgs, err := channel.Consume(
 		"geofence_alerts",
